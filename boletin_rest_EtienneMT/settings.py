@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_spectacular',
-    'gestion_vehiculos'
+    'gestion_vehiculos',
+    'alquiler_patinetes',
 ]
 
 MIDDLEWARE = [
