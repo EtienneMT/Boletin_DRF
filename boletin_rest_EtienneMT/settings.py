@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'drf_spectacular'
+    'drf_spectacular',
+    'gestion_vehiculos'
 ]
 
 MIDDLEWARE = [
@@ -149,8 +150,8 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'API DRF tutorial',
-    'DESCRIPTION': 'Tutorial de django rest framework para crear una API',
+    'TITLE': 'API DRF',
+    'DESCRIPTION': '',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     # OTHER SETTINGS
