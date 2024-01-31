@@ -1,4 +1,4 @@
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -28,8 +28,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def top_tres_usuarios_alquileres(self, request):
-        usuarios_top_tres = Usuario.objects.annotate(num_alquileres=Count('alquiler')).order_by('-num_alquileres')[
-                            :3]
+        usuarios_top_tres = Usuario.objects.annotate(num_alquileres=Count('alquiler')).order_by('-num_alquileres')[:3]
         serializer = UsuarioSerializer(usuarios_top_tres, many=True)
         return Response(serializer.data)
 
@@ -44,9 +43,13 @@ class AlquilerViewSet(viewsets.ModelViewSet):
         patinete_id = request.data.get('patinete_id')
 
         try:
-            patinete = Patinete.objects.get(id=patinete_id, alquiler__isnull=True)
+            patinete = Patinete.objects.get(id=patinete_id)
         except Patinete.DoesNotExist:
-            return Response({'error': 'Patinete no disponible para alquiler'}, status=400)
+            return Response({'error': 'Patinete no encontrado'}, status=400)
+
+        # Verificar si el patinete está disponible
+        if patinete.alquiler is not None and patinete.alquiler.fecha_entrega is None:
+            return Response({'error': 'Patinete ya está en alquiler'}, status=400)
 
         fecha_desbloqueo = timezone.now()
 
@@ -95,13 +98,15 @@ class PatineteViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def patinetes_libres(self, request):
-        patinetes_libres = Patinete.objects.filter(alquiler__isnull=True)
+        filtro_patinetes_libre = Q(alquiler__isnull=True) | Q(alquiler__fecha_desbloqueo__isnull=False)
+        patinetes_libres = Patinete.objects.filter(filtro_patinetes_libre)
         serializer = PatineteSerializer(patinetes_libres, many=True)
         return Response(serializer.data)
 
     @action(detail=False, methods=['get'])
     def patinetes_ocupados(self, request):
-        patinetes_ocupados = Patinete.objects.exclude(alquiler__isnull=True)
+        filtro_patinetes_libre = Q(alquiler__isnull=True) | Q(alquiler__fecha_desbloqueo__isnull=False)
+        patinetes_ocupados = Patinete.objects.exclude(filtro_patinetes_libre)
         serializer = PatineteSerializer(patinetes_ocupados, many=True)
         return Response(serializer.data)
 
