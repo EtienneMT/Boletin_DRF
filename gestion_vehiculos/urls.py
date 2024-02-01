@@ -8,5 +8,4 @@ router.register(r'marcas', MarcaViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('listado_marca/', VehiculoViewSet.as_view({'get': 'listar_por_marca'}), name='listar-marca'),
 ]

@@ -1,5 +1,6 @@
 django~=5.0.1
 djangorestframework
+django-filter
 
 # Django environment variables
 # https://django-environ.readthedocs.io/
